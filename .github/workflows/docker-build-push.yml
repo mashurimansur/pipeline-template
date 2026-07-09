@@ -10,6 +10,10 @@ on:
         type: string
         default: 'ghcr.io'
         required: false
+      build-args:
+        type: string
+        default: ''
+        required: false
     outputs:
       image-tag:
         description: "The short SHA tag of the built image"
@@ -46,3 +50,6 @@ jobs:
           tags: |
             ${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}:latest
             ${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}:${{ steps.vars.outputs.sha_short }}
+          build-args: |
+            VERSION=${{ steps.vars.outputs.sha_short }}
+            ${{ inputs.build-args }}

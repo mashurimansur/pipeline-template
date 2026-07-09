@@ -1,9 +1,7 @@
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch: # Hanya manual (karena ini adalah berkas referensi template)
 
 permissions:
   contents: read
