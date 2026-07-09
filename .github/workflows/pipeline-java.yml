@@ -30,7 +30,7 @@ on:
         required: true
       namespace:
         type: string
-        default: 'default'
+        default: 'dev'
         required: false
       deploy-runs-on:
         type: string
