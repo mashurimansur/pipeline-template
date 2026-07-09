@@ -98,17 +98,19 @@ jobs:
   sonarqube:
     runs-on: ubuntu-latest
     needs: unit-tests
-    if: ${{ secrets.sonar-token != '' && secrets.sonar-host-url != '' }}
     steps:
       - name: Checkout code
+        if: ${{ secrets.sonar-token != '' && secrets.sonar-host-url != '' }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Download coverage report
+        if: ${{ secrets.sonar-token != '' && secrets.sonar-host-url != '' }}
         uses: actions/download-artifact@v4
         with:
           name: coverage-report
       - name: SonarQube Scan
+        if: ${{ secrets.sonar-token != '' && secrets.sonar-host-url != '' }}
         uses: sonarsource/sonarqube-scan-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.sonar-token }}
