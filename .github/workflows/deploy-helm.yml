@@ -1,0 +1,33 @@
+name: Deploy via Helm
+
+on:
+  workflow_call:
+    inputs:
+      release-name:
+        type: string
+        required: true
+      chart-path:
+        type: string
+        required: true
+      namespace:
+        type: string
+        default: 'default'
+        required: false
+      image-tag:
+        type: string
+        required: true
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, home-k8s]
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to K8s via Helm
+        run: |
+          helm upgrade --install ${{ inputs.release-name }} ${{ inputs.chart-path }} \
+            --namespace ${{ inputs.namespace }} \
+            --create-namespace \
+            --set image.tag=${{ inputs.image-tag }}
