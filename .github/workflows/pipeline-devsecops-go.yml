@@ -44,6 +44,18 @@ on:
         type: boolean
         default: false
         required: false
+      deploy-dev:
+        type: boolean
+        default: true
+        required: false
+      deploy-preprod:
+        type: boolean
+        default: false
+        required: false
+      deploy-prod:
+        type: boolean
+        default: false
+        required: false
     secrets:
       sonar-token:
         required: false
@@ -191,6 +203,7 @@ jobs:
   deploy-dev:
     runs-on: ${{ fromJSON(inputs.deploy-runs-on) }}
     needs: build-and-push
+    if: ${{ inputs.deploy-dev }}
     environment: dev
     steps:
       - name: Checkout code
@@ -206,6 +219,7 @@ jobs:
   deploy-preprod:
     runs-on: ${{ fromJSON(inputs.deploy-runs-on) }}
     needs: build-and-push
+    if: ${{ inputs.deploy-preprod }}
     environment: preprod
     steps:
       - name: Checkout code
@@ -221,6 +235,7 @@ jobs:
   deploy-prod:
     runs-on: ${{ fromJSON(inputs.deploy-runs-on) }}
     needs: build-and-push
+    if: ${{ inputs.deploy-prod }}
     environment: production
     steps:
       - name: Checkout code
