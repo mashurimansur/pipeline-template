@@ -34,7 +34,7 @@ on:
         required: false
       prod-namespace:
         type: string
-        default: 'prod'
+        default: 'production'
         required: false
       deploy-runs-on:
         type: string
@@ -191,7 +191,7 @@ jobs:
   deploy-dev:
     runs-on: ${{ fromJSON(inputs.deploy-runs-on) }}
     needs: build-and-push
-    environment: development
+    environment: dev
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
