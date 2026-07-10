@@ -24,9 +24,17 @@ on:
       chart-path:
         type: string
         required: true
-      namespace:
+      dev-namespace:
         type: string
         default: 'dev'
+        required: false
+      preprod-namespace:
+        type: string
+        default: 'preprod'
+        required: false
+      prod-namespace:
+        type: string
+        default: 'prod'
         required: false
       deploy-runs-on:
         type: string
@@ -180,17 +188,47 @@ jobs:
           docker push ${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}:${{ steps.vars.outputs.sha_short }}
           docker push ${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}:latest
 
-  deploy:
+  deploy-dev:
+    runs-on: ${{ fromJSON(inputs.deploy-runs-on) }}
+    needs: build-and-push
+    environment: development
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+      - name: Deploy to K8s via Helm (Dev)
+        run: |
+          helm upgrade --install ${{ inputs.release-name }} ${{ inputs.chart-path }} \
+            --namespace ${{ inputs.dev-namespace }} \
+            --create-namespace \
+            --set image.repository=${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }} \
+            --set image.tag=${{ needs.build-and-push.outputs.image-tag }}
+
+  deploy-preprod:
+    runs-on: ${{ fromJSON(inputs.deploy-runs-on) }}
+    needs: build-and-push
+    environment: preprod
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+      - name: Deploy to K8s via Helm (Preprod)
+        run: |
+          helm upgrade --install ${{ inputs.release-name }} ${{ inputs.chart-path }} \
+            --namespace ${{ inputs.preprod-namespace }} \
+            --create-namespace \
+            --set image.repository=${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }} \
+            --set image.tag=${{ needs.build-and-push.outputs.image-tag }}
+
+  deploy-prod:
     runs-on: ${{ fromJSON(inputs.deploy-runs-on) }}
     needs: build-and-push
     environment: production
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
-      - name: Deploy to K8s via Helm
+      - name: Deploy to K8s via Helm (Prod)
         run: |
           helm upgrade --install ${{ inputs.release-name }} ${{ inputs.chart-path }} \
-            --namespace ${{ inputs.namespace }} \
+            --namespace ${{ inputs.prod-namespace }} \
             --create-namespace \
             --set image.repository=${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }} \
             --set image.tag=${{ needs.build-and-push.outputs.image-tag }}
